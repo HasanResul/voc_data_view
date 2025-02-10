@@ -10,6 +10,8 @@ import streamlit as st
 from streamlit import session_state as ss
 from motor.motor_asyncio import AsyncIOMotorClient
 
+st.set_page_config(layout="wide")
+
 API_HOST = "https://shivering-jillayne-vocaelis-2b8c53fa.koyeb.app"
 
 @st.cache_resource
@@ -91,46 +93,51 @@ async def main() -> None:
     students = await get_students_db()
 
     student = st.selectbox("Select a student", students, format_func=lambda x: x['first_name'])
+    access_token = await login_user(student['email'])
 
     data_cols = st.columns(2)
 
-    access_token = await login_user(student['email'])
+    coroutines = [
+        get_student_remaining_rights_db(student['_id']),
+        get_incomplete_assignments_db(student['_id']),
+        get_completed_assignments_db(student['_id']),
+        get_student_suggested_stories_db(student['_id']),
+        get_student_remaining_rights_api(access_token),
+        get_incomplete_assignments_api(access_token),
+        get_completed_assignments_api(access_token),
+        get_student_suggested_stories_api(access_token)
+    ]
+
+    results = await asyncio.gather(*coroutines)
+
+    db_results = results[:4]
+    api_results = results[4:]
 
     with data_cols[0].container(border=True):
         st.write("DB Data")
-        remaining_rights = await get_student_remaining_rights_db(student['_id'])
-        st.write(remaining_rights)
+        st.write(db_results[0])  # remaining_rights
 
-        incomplete_assignments = await get_incomplete_assignments_db(student['_id'])
         with st.expander("Incomplete Assignments"):
-            st.write(incomplete_assignments)
+            st.write(db_results[1])  # incomplete_assignments
         
-        completed_assignments = await get_completed_assignments_db(student['_id'])
         with st.expander("Completed Assignments"):
-            st.write(completed_assignments)
+            st.write(db_results[2])  # completed_assignments
 
-        suggested_stories = await get_student_suggested_stories_db(student['_id'])
         with st.expander("Suggested Stories"):
-            st.write(suggested_stories)
-
+            st.write(db_results[3])  # suggested_stories
 
     with data_cols[1].container(border=True):
         st.write("API Data")
-        remaining_rights = await get_student_remaining_rights_api(access_token)
-        st.write(remaining_rights)
+        st.write(api_results[0])  # remaining_rights
 
-        incomplete_assignments = await get_incomplete_assignments_api(access_token)
         with st.expander("Incomplete Assignments"):
-            st.write(incomplete_assignments)
+            st.write(api_results[1])  # incomplete_assignments
         
-        completed_assignments = await get_completed_assignments_api(access_token)
         with st.expander("Completed Assignments"):
-            st.write(completed_assignments)
+            st.write(api_results[2])  # completed_assignments
 
-        suggested_stories = await get_student_suggested_stories_api(access_token)
         with st.expander("Suggested Stories"):
-            st.write(suggested_stories)
+            st.write(api_results[3])  # suggested_stories
 
 if __name__ == "__main__":
-    st.set_page_config(layout="wide")
     asyncio.run(main())
