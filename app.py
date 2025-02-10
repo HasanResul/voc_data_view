@@ -117,26 +117,26 @@ async def main() -> None:
         st.write("DB Data")
         st.write(db_results[0])  # remaining_rights
 
-        with st.expander("Incomplete Assignments"):
+        with st.expander("Incomplete Assignments", expanded=True):
             st.write(db_results[1])  # incomplete_assignments
         
-        with st.expander("Completed Assignments"):
+        with st.expander("Completed Assignments", expanded=True):
             st.write(db_results[2])  # completed_assignments
 
-        with st.expander("Suggested Stories"):
+        with st.expander("Suggested Stories", expanded=True):
             st.write(db_results[3])  # suggested_stories
 
     with data_cols[1].container(border=True):
         st.write("API Data")
         st.write(api_results[0])  # remaining_rights
 
-        with st.expander("Incomplete Assignments"):
+        with st.expander("Incomplete Assignments", expanded=True):
             st.write(api_results[1])  # incomplete_assignments
         
-        with st.expander("Completed Assignments"):
+        with st.expander("Completed Assignments", expanded=True):
             st.write(api_results[2])  # completed_assignments
 
-        with st.expander("Suggested Stories"):
+        with st.expander("Suggested Stories", expanded=True):
             st.write(api_results[3])  # suggested_stories
 
     if st.button("Refresh Data"):
