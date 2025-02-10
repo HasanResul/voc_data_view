@@ -139,5 +139,8 @@ async def main() -> None:
         with st.expander("Suggested Stories"):
             st.write(api_results[3])  # suggested_stories
 
+    if st.button("Refresh Data"):
+        st.rerun()
+
 if __name__ == "__main__":
     asyncio.run(main())
