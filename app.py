@@ -69,7 +69,7 @@ async def get_incomplete_assignments_api(access_token: str):
             f"{API_HOST}/assignment/student/incomplete",
             headers={"Authorization": f"Bearer {access_token}"}
         )
-        return [{"story_title":await get_story_title_db(ObjectId(assignment["story"]['id'])), "started": assignment["started"], "deducts_practice_rights": assignment["deducts_practice_rights"], "due_date": assignment["due_date"]} for assignment in response.json()]
+        return [{"story_title":await get_story_title_db(ObjectId(assignment["story"]['id'])), "started": assignment["started"], "deducts_practice_rights": assignment["deducts_practice_rights"], "due_date": assignment["due_date"]} for assignment in response.json().get("items", [])]
 
 
 async def get_completed_assignments_api(access_token: str):
@@ -78,7 +78,7 @@ async def get_completed_assignments_api(access_token: str):
             f"{API_HOST}/assignment/student/completed",
             headers={"Authorization": f"Bearer {access_token}"}
         )
-        return [{"story_title": await get_story_title_db(ObjectId(assignment["story"]['id'])), "due_date": assignment["due_date"]} for assignment in response.json()]
+        return [{"story_title": await get_story_title_db(ObjectId(assignment["story"]['id'])), "due_date": assignment["due_date"]} for assignment in response.json().get("items", [])]
 
 
 async def get_student_suggested_stories_api(access_token: str):
